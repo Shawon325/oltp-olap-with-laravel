@@ -11,17 +11,12 @@ use ReflectionMethod;
 
 class MigrateCommand extends BaseMigrateCommand
 {
-    protected Filesystem $files;
-
     /**
      * @param  Dispatcher  $dispatcher
-     * @param  Filesystem  $files
      */
-    public function __construct(Dispatcher $dispatcher, Filesystem $files)
+    public function __construct(Dispatcher $dispatcher)
     {
         parent::__construct(app("migrator"), $dispatcher);
-
-        $this->files = $files;
     }
 
     /**
