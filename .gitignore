@@ -22,3 +22,6 @@ yarn-error.log
 /caddy
 frankenphp
 frankenphp-worker.php
+# macOS
+.DS_Store
+**/.DS_Store

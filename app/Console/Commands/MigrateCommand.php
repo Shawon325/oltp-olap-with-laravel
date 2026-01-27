@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
+use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Console\Migrations\MigrateCommand as BaseMigrateCommand;
-use Illuminate\Filesystem\Filesystem;
 use ReflectionException;
-use ReflectionMethod;
 
 class MigrateCommand extends BaseMigrateCommand
 {
@@ -57,10 +56,11 @@ class MigrateCommand extends BaseMigrateCommand
         $filteredMigrations = [];
 
         foreach ($migrations as $name => $path) {
-            $method = new ReflectionMethod("Illuminate\Database\Migrations\Migrator", "resolvePath");
-            $method->setAccessible(true);
+            $resolver = Closure::bind(function ($path) {
+                return $this->resolvePath($path);
+            }, $this->migrator, get_class($this->migrator));
 
-            $migration = $method->invokeArgs($this->migrator, [$path]);
+            $migration = $resolver($path);
 
             if ($migration->getConnection() === $connection) {
                 $filteredMigrations[$name] = $path;
