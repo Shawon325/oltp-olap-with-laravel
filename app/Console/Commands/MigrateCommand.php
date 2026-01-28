@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use Closure;
+use ReflectionException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Console\Migrations\MigrateCommand as BaseMigrateCommand;
-use ReflectionException;
 
 class MigrateCommand extends BaseMigrateCommand
 {
@@ -27,19 +27,21 @@ class MigrateCommand extends BaseMigrateCommand
     {
         $database = $this->option('database');
 
-        $this->migrator->usingConnection($database, function () use ($database) {
-            $this->prepareDatabase();
+        $this->migrator->usingConnection($database,
+            function () use ($database) {
+                $this->prepareDatabase();
 
-            $migrations = $this->migrator->getMigrationFiles($this->getMigrationPaths());
+                $migrations = $this->migrator->getMigrationFiles($this->getMigrationPaths());
 
-            $migrationsToRun = $this->filterMigrationsByConnection($migrations, $database);
+                $migrationsToRun = $this->filterMigrationsByConnection($migrations,
+                    $database);
 
-            $this->migrator->setOutput($this->output)
-                ->run($migrationsToRun, [
-                    'pretend' => $this->option('pretend'),
-                    'step' => $this->option('step'),
-                ]);
-        });
+                $this->migrator->setOutput($this->output)
+                    ->run($migrationsToRun, [
+                        'pretend' => $this->option('pretend'),
+                        'step' => $this->option('step'),
+                    ]);
+            });
 
         return 0;
     }
@@ -51,8 +53,10 @@ class MigrateCommand extends BaseMigrateCommand
      * @throws FileNotFoundException
      * @throws ReflectionException
      */
-    protected function filterMigrationsByConnection(array $migrations, ?string $connection): array
-    {
+    protected function filterMigrationsByConnection(
+        array $migrations,
+        ?string $connection
+    ): array {
         $filteredMigrations = [];
 
         foreach ($migrations as $name => $path) {
